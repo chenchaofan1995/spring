@@ -52,7 +52,7 @@ import org.springframework.util.StringUtils;
  * @see ClassPathBeanDefinitionScanner#scan(String...)
  * @see ComponentScanBeanDefinitionParser
  */
-class ComponentScanAnnotationParser {
+public class ComponentScanAnnotationParser {
 
 	private final Environment environment;
 
@@ -66,22 +66,46 @@ class ComponentScanAnnotationParser {
 	public ComponentScanAnnotationParser(Environment environment, ResourceLoader resourceLoader,
 			BeanNameGenerator beanNameGenerator, BeanDefinitionRegistry registry) {
 
+		/**
+		 *该对象存储所有的环境变量
+		 */
 		this.environment = environment;
+		/**
+		 * 资源加载器
+		 */
 		this.resourceLoader = resourceLoader;
+		/**
+		 * bean的名称生成器
+		 */
 		this.beanNameGenerator = beanNameGenerator;
+		/**
+		 * 该对象具有bean定义的注册功能
+		 */
 		this.registry = registry;
 	}
 
 
+	/**
+	 *
+	 * @param componentScan @ComponentScan的所有注解属性
+	 * @param declaringClass
+	 * @return
+	 */
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, final String declaringClass) {
 		ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this.registry,
 				componentScan.getBoolean("useDefaultFilters"), this.environment, this.resourceLoader);
 
+		/**
+		 * 添加Bean的名称生成器
+		 */
 		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");
 		boolean useInheritedGenerator = (BeanNameGenerator.class == generatorClass);
 		scanner.setBeanNameGenerator(useInheritedGenerator ? this.beanNameGenerator :
 				BeanUtils.instantiateClass(generatorClass));
 
+		/**
+		 * 添加代理模式：基本不用，可忽略
+		 */
 		ScopedProxyMode scopedProxyMode = componentScan.getEnum("scopedProxy");
 		if (scopedProxyMode != ScopedProxyMode.DEFAULT) {
 			scanner.setScopedProxyMode(scopedProxyMode);
@@ -91,24 +115,39 @@ class ComponentScanAnnotationParser {
 			scanner.setScopeMetadataResolver(BeanUtils.instantiateClass(resolverClass));
 		}
 
+		/**
+		 * 添加配置资源的正则表达式
+		 */
 		scanner.setResourcePattern(componentScan.getString("resourcePattern"));
 
+		/**
+		 * 添加包含过滤器
+		 */
 		for (AnnotationAttributes filter : componentScan.getAnnotationArray("includeFilters")) {
 			for (TypeFilter typeFilter : typeFiltersFor(filter)) {
 				scanner.addIncludeFilter(typeFilter);
 			}
 		}
+		/**
+		 * 添加排除过滤器
+		 */
 		for (AnnotationAttributes filter : componentScan.getAnnotationArray("excludeFilters")) {
 			for (TypeFilter typeFilter : typeFiltersFor(filter)) {
 				scanner.addExcludeFilter(typeFilter);
 			}
 		}
 
+		/**
+		 * 是否延迟加载
+		 */
 		boolean lazyInit = componentScan.getBoolean("lazyInit");
 		if (lazyInit) {
 			scanner.getBeanDefinitionDefaults().setLazyInit(true);
 		}
 
+		/**
+		 * 添加指定扫描的包
+		 */
 		Set<String> basePackages = new LinkedHashSet<>();
 		String[] basePackagesArray = componentScan.getStringArray("basePackages");
 		for (String pkg : basePackagesArray) {
@@ -116,6 +155,10 @@ class ComponentScanAnnotationParser {
 					ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
 			Collections.addAll(basePackages, tokenized);
 		}
+
+		/**
+		 * 添加指定扫描的包
+		 */
 		for (Class<?> clazz : componentScan.getClassArray("basePackageClasses")) {
 			basePackages.add(ClassUtils.getPackageName(clazz));
 		}
@@ -123,12 +166,18 @@ class ComponentScanAnnotationParser {
 			basePackages.add(ClassUtils.getPackageName(declaringClass));
 		}
 
+		/**
+		 * 添加一个默认的排除过滤器，主要用于排除程序启动的配置类。如果启动类也在扫描的包下，将会引起重复。因为扫描包的时也会将启动类扫描进来。
+		 */
 		scanner.addExcludeFilter(new AbstractTypeHierarchyTraversingFilter(false, false) {
 			@Override
 			protected boolean matchClassName(String className) {
 				return declaringClass.equals(className);
 			}
 		});
+		/**
+		 * 开始扫描包下的类，并返回BeanDefinition
+		 */
 		return scanner.doScan(StringUtils.toStringArray(basePackages));
 	}
 

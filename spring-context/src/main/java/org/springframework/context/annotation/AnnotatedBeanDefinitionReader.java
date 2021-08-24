@@ -83,7 +83,13 @@ public class AnnotatedBeanDefinitionReader {
 	public AnnotatedBeanDefinitionReader(BeanDefinitionRegistry registry, Environment environment) {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		Assert.notNull(environment, "Environment must not be null");
+		/**
+		 * Bean定义的注册接口
+		 */
 		this.registry = registry;
+		/**
+		 * 条件推断器
+		 */
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}

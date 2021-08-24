@@ -4,6 +4,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * FactoryBean测试用列
+ */
 @Configuration
 @ComponentScan({"ccf.factorybean"})
 public class TestApplication {

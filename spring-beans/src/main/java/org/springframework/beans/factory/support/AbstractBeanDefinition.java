@@ -65,31 +65,38 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	 */
 	public static final String SCOPE_DEFAULT = "";
 
+	/***************************自动注入策略的常量值***************************/
+
 	/**
+	 * 没有自动注入
 	 * Constant that indicates no external autowiring at all.
 	 * @see #setAutowireMode
 	 */
 	public static final int AUTOWIRE_NO = AutowireCapableBeanFactory.AUTOWIRE_NO;
 
 	/**
+	 * 按照名称注入
 	 * Constant that indicates autowiring bean properties by name.
 	 * @see #setAutowireMode
 	 */
 	public static final int AUTOWIRE_BY_NAME = AutowireCapableBeanFactory.AUTOWIRE_BY_NAME;
 
 	/**
+	 * 按照类型注入
 	 * Constant that indicates autowiring bean properties by type.
 	 * @see #setAutowireMode
 	 */
 	public static final int AUTOWIRE_BY_TYPE = AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE;
 
 	/**
+	 * 按照构造器注入
 	 * Constant that indicates autowiring a constructor.
 	 * @see #setAutowireMode
 	 */
 	public static final int AUTOWIRE_CONSTRUCTOR = AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR;
 
 	/**
+	 * 过时舍弃，不在说明
 	 * Constant that indicates determining an appropriate autowire strategy
 	 * through introspection of the bean class.
 	 * @see #setAutowireMode
@@ -99,6 +106,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Deprecated
 	public static final int AUTOWIRE_AUTODETECT = AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT;
 
+
+
+	/***************************依赖检查策略的常量值***************************/
 	/**
 	 * Constant that indicates no dependency check at all.
 	 * @see #setDependencyCheck
@@ -1185,7 +1195,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		return (ObjectUtils.nullSafeEquals(getBeanClassName(), that.getBeanClassName()) &&
 				ObjectUtils.nullSafeEquals(this.scope, that.scope) &&
 				this.abstractFlag == that.abstractFlag &&
-				this.lazyInit == that.lazyInit &&
+				this.lazyInit .equals( that.lazyInit) &&
 				this.autowireMode == that.autowireMode &&
 				this.dependencyCheck == that.dependencyCheck &&
 				Arrays.equals(this.dependsOn, that.dependsOn) &&

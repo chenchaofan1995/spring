@@ -93,16 +93,31 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 
 	private String resourcePattern = DEFAULT_RESOURCE_PATTERN;
 
+	/**
+	 * 包含过滤器
+	 */
 	private final List<TypeFilter> includeFilters = new LinkedList<>();
 
+	/**
+	 * 排除过滤器
+	 */
 	private final List<TypeFilter> excludeFilters = new LinkedList<>();
 
+	/**
+	 * 环境对象
+	 */
 	@Nullable
 	private Environment environment;
 
+	/**
+	 * 条件推断器
+	 */
 	@Nullable
 	private ConditionEvaluator conditionEvaluator;
 
+	/**
+	 * 资源匹配解析器：用于根据包扫描java文件
+	 */
 	@Nullable
 	private ResourcePatternResolver resourcePatternResolver;
 
@@ -415,8 +430,14 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
+			/**
+			 * 包扫描路径
+			 */
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
+			/**
+			 * 获取包及其子包下的所有java类
+			 */
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
@@ -426,8 +447,18 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 				}
 				if (resource.isReadable()) {
 					try {
+						/**
+						 * 获取类的元数据读取器
+						 */
 						MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
-						if (isCandidateComponent(metadataReader)) {
+						/**
+						 * 判断调用@ComponentScan注解里的排除和包含过滤器，true证明是需要的过滤器
+						 */
+						boolean isCandidateComponent = isCandidateComponent(metadataReader);
+						if (isCandidateComponent) {
+							/**
+							 * 转换成bean定义
+							 */
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setSource(resource);
 							if (isCandidateComponent(sbd)) {

@@ -85,8 +85,9 @@ public interface AnnotatedTypeMetadata {
 	 * Retrieve the attributes of the annotation of the given type, if any (i.e. if
 	 * defined on the underlying element, as direct annotation or meta-annotation),
 	 * also taking attribute overrides on composed annotations into account.
-	 * @param annotationName the fully qualified class name of the annotation
-	 * type to look for
+	 *
+	 * @param annotationName 注解的全类名称。例如：@Configuration注解的全类名称是：org.springframework.context.annotation.Configuratio.class
+	 *
 	 * @param classValuesAsString whether to convert class references to String
 	 * class names for exposure as values in the returned Map, instead of Class
 	 * references which might potentially have to be loaded first

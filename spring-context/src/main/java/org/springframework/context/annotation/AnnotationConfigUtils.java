@@ -50,12 +50,12 @@ import org.springframework.util.ClassUtils;
  * @author Chris Beams
  * @author Phillip Webb
  * @author Stephane Nicoll
- * @since 2.5
  * @see ContextAnnotationAutowireCandidateResolver
  * @see ConfigurationClassPostProcessor
  * @see CommonAnnotationBeanPostProcessor
  * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
  * @see org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor
+ * @since 2.5
  */
 public abstract class AnnotationConfigUtils {
 
@@ -71,6 +71,7 @@ public abstract class AnnotationConfigUtils {
 	 * and {@code AnnotationConfigWebApplicationContext} during bootstrap in order to make
 	 * any custom name generation strategy available to the underlying
 	 * {@link ConfigurationClassPostProcessor}.
+	 *
 	 * @since 3.1.1
 	 */
 	public static final String CONFIGURATION_BEAN_NAME_GENERATOR =
@@ -84,6 +85,7 @@ public abstract class AnnotationConfigUtils {
 
 	/**
 	 * The bean name of the internally managed Required annotation processor.
+	 *
 	 * @deprecated as of 5.1, since no Required processor is registered by default anymore
 	 */
 	@Deprecated
@@ -131,6 +133,7 @@ public abstract class AnnotationConfigUtils {
 
 	/**
 	 * Register all relevant annotation post processors in the given registry.
+	 *
 	 * @param registry the registry to operate on
 	 */
 	public static void registerAnnotationConfigProcessors(BeanDefinitionRegistry registry) {
@@ -139,9 +142,10 @@ public abstract class AnnotationConfigUtils {
 
 	/**
 	 * Register all relevant annotation post processors in the given registry.
+	 *
 	 * @param registry the registry to operate on
-	 * @param source the configuration source element (already extracted)
-	 * that this registration was triggered from. May be {@code null}.
+	 * @param source   the configuration source element (already extracted)
+	 *                 that this registration was triggered from. May be {@code null}.
 	 * @return a Set of BeanDefinitionHolders, containing all bean definitions
 	 * that have actually been registered by this call
 	 */
@@ -158,55 +162,78 @@ public abstract class AnnotationConfigUtils {
 			}
 		}
 
-		Set<BeanDefinitionHolder> beanDefs = new LinkedHashSet<>(8);
+		Set<BeanDefinitionHolder> beanDeanDefinitionSet = new LinkedHashSet<>(8);
 
+		/**
+		 * 注册配置类解析器的Bean定义
+		 */
 		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
 			def.setSource(source);
-			beanDefs.add(registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME));
+			BeanDefinitionHolder beanDefinitionHolder = registerPostProcessor(registry, def, CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME);
+			beanDeanDefinitionSet.add(beanDefinitionHolder);
 		}
 
+		/**
+		 * 注册解析@Autowire注解的Bean定义
+		 */
 		if (!registry.containsBeanDefinition(AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(AutowiredAnnotationBeanPostProcessor.class);
 			def.setSource(source);
-			beanDefs.add(registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME));
+			BeanDefinitionHolder beanDefinitionHolder = registerPostProcessor(registry, def, AUTOWIRED_ANNOTATION_PROCESSOR_BEAN_NAME);
+			beanDeanDefinitionSet.add(beanDefinitionHolder);
 		}
 
 		// Check for JSR-250 support, and if present add the CommonAnnotationBeanPostProcessor.
+		/**
+		 * 注册解析JSR-250注解的Bean定义
+		 */
 		if (jsr250Present && !registry.containsBeanDefinition(COMMON_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(CommonAnnotationBeanPostProcessor.class);
 			def.setSource(source);
-			beanDefs.add(registerPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME));
+			BeanDefinitionHolder beanDefinitionHolder = registerPostProcessor(registry, def, COMMON_ANNOTATION_PROCESSOR_BEAN_NAME);
+			beanDeanDefinitionSet.add(beanDefinitionHolder);
 		}
 
 		// Check for JPA support, and if present add the PersistenceAnnotationBeanPostProcessor.
+		/**
+		 * 注册解析JPA注解的Bean定义
+		 */
 		if (jpaPresent && !registry.containsBeanDefinition(PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition();
 			try {
 				def.setBeanClass(ClassUtils.forName(PERSISTENCE_ANNOTATION_PROCESSOR_CLASS_NAME,
 						AnnotationConfigUtils.class.getClassLoader()));
-			}
-			catch (ClassNotFoundException ex) {
+			} catch (ClassNotFoundException ex) {
 				throw new IllegalStateException(
 						"Cannot load optional framework class: " + PERSISTENCE_ANNOTATION_PROCESSOR_CLASS_NAME, ex);
 			}
 			def.setSource(source);
-			beanDefs.add(registerPostProcessor(registry, def, PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME));
+			BeanDefinitionHolder beanDefinitionHolder = registerPostProcessor(registry, def, PERSISTENCE_ANNOTATION_PROCESSOR_BEAN_NAME);
+			beanDeanDefinitionSet.add(beanDefinitionHolder);
 		}
 
+		/**
+		 * 注册事件监听器的处理器bena定义
+		 */
 		if (!registry.containsBeanDefinition(EVENT_LISTENER_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(EventListenerMethodProcessor.class);
 			def.setSource(source);
-			beanDefs.add(registerPostProcessor(registry, def, EVENT_LISTENER_PROCESSOR_BEAN_NAME));
+			BeanDefinitionHolder beanDefinitionHolder = registerPostProcessor(registry, def, EVENT_LISTENER_PROCESSOR_BEAN_NAME);
+			beanDeanDefinitionSet.add(beanDefinitionHolder);
 		}
 
+		/**
+		 * 注册事件监听器工厂的bean定义
+		 */
 		if (!registry.containsBeanDefinition(EVENT_LISTENER_FACTORY_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(DefaultEventListenerFactory.class);
 			def.setSource(source);
-			beanDefs.add(registerPostProcessor(registry, def, EVENT_LISTENER_FACTORY_BEAN_NAME));
+			BeanDefinitionHolder beanDefinitionHolder = registerPostProcessor(registry, def, EVENT_LISTENER_FACTORY_BEAN_NAME);
+			beanDeanDefinitionSet.add(beanDefinitionHolder);
 		}
 
-		return beanDefs;
+		return beanDeanDefinitionSet;
 	}
 
 	private static BeanDefinitionHolder registerPostProcessor(
@@ -221,11 +248,9 @@ public abstract class AnnotationConfigUtils {
 	private static DefaultListableBeanFactory unwrapDefaultListableBeanFactory(BeanDefinitionRegistry registry) {
 		if (registry instanceof DefaultListableBeanFactory) {
 			return (DefaultListableBeanFactory) registry;
-		}
-		else if (registry instanceof GenericApplicationContext) {
+		} else if (registry instanceof GenericApplicationContext) {
 			return ((GenericApplicationContext) registry).getDefaultListableBeanFactory();
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
@@ -236,28 +261,42 @@ public abstract class AnnotationConfigUtils {
 
 	static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
 		AnnotationAttributes lazy = attributesFor(metadata, Lazy.class);
+		/**
+		 * 是否是懒加载
+		 */
 		if (lazy != null) {
 			abd.setLazyInit(lazy.getBoolean("value"));
-		}
-		else if (abd.getMetadata() != metadata) {
+		} else if (abd.getMetadata() != metadata) {
 			lazy = attributesFor(abd.getMetadata(), Lazy.class);
 			if (lazy != null) {
 				abd.setLazyInit(lazy.getBoolean("value"));
 			}
 		}
 
+		/**
+		 * 是否是主要的bean
+		 */
 		if (metadata.isAnnotated(Primary.class.getName())) {
 			abd.setPrimary(true);
 		}
+		/**
+		 * bean的依赖对象
+		 */
 		AnnotationAttributes dependsOn = attributesFor(metadata, DependsOn.class);
 		if (dependsOn != null) {
 			abd.setDependsOn(dependsOn.getStringArray("value"));
 		}
 
+		/**
+		 * 角色
+		 */
 		AnnotationAttributes role = attributesFor(metadata, Role.class);
 		if (role != null) {
 			abd.setRole(role.getNumber("value").intValue());
 		}
+		/**
+		 * bean定义的描述
+		 */
 		AnnotationAttributes description = attributesFor(metadata, Description.class);
 		if (description != null) {
 			abd.setDescription(description.getString("value"));
@@ -286,7 +325,7 @@ public abstract class AnnotationConfigUtils {
 	}
 
 	static Set<AnnotationAttributes> attributesForRepeatable(AnnotationMetadata metadata,
-			Class<?> containerClass, Class<?> annotationClass) {
+															 Class<?> containerClass, Class<?> annotationClass) {
 
 		return attributesForRepeatable(metadata, containerClass.getName(), annotationClass.getName());
 	}
