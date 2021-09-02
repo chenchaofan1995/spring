@@ -154,7 +154,9 @@ abstract class ConfigurationClassUtils {
 			return false;
 		}
 
-		// Any of the typical annotations found?
+		/**
+		 * 如果该类被@Component、@ComponentScan、@ComponentScan、ImportResource注解标记，就是后选配置类
+		 */
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {
 				return true;

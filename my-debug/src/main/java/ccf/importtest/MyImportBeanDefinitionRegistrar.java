@@ -1,4 +1,4 @@
-package ccf.selelctimport;
+package ccf.importtest;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

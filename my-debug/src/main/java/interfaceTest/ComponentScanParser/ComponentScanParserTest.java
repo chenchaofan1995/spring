@@ -2,15 +2,12 @@ package interfaceTest.ComponentScanParser;
 
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.type.AnnotationMetadata;
 
-import java.util.Map;
 import java.util.Set;
 
 @ComponentScan("interfaceTest.ComponentScanParser")

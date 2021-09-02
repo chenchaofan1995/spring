@@ -1,4 +1,4 @@
-package ccf.selelctimport;
+package ccf.importtest;
 
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
