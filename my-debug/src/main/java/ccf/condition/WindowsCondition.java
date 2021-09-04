@@ -10,7 +10,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 public class WindowsCondition implements Condition {
 	/**
 	 * @param conditionContext:判断条件能使用的上下文环境
-	 * @param annotatedTypeMetadata:注解所在类的注释信息
+	 * @param annotatedTypeMetadata:用来获取被@Conditional标注的类上的所有注解信息
 	 * */
 	@Override
 	public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {

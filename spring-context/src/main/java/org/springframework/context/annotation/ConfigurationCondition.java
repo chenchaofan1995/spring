@@ -17,6 +17,10 @@
 package org.springframework.context.annotation;
 
 /**
+ * 可分阶段判断bean是否应该被注册。
+ * 第一阶段：bean定义注册阶段。
+ * 第二阶段：bean对象注册阶段。
+ * <p>
  * A {@link Condition} that offers more fine-grained control when used with
  * {@code @Configuration}. Allows certain conditions to adapt when they match
  * based on the configuration phase. For example, a condition that checks if a bean
@@ -24,12 +28,14 @@ package org.springframework.context.annotation;
  * {@link ConfigurationPhase#REGISTER_BEAN REGISTER_BEAN} {@link ConfigurationPhase}.
  *
  * @author Phillip Webb
- * @since 4.0
  * @see Configuration
+ * @since 4.0
  */
 public interface ConfigurationCondition extends Condition {
 
 	/**
+	 *
+	 * 获取条件执行阶段
 	 * Return the {@link ConfigurationPhase} in which the condition should be evaluated.
 	 */
 	ConfigurationPhase getConfigurationPhase();
@@ -41,6 +47,8 @@ public interface ConfigurationCondition extends Condition {
 	enum ConfigurationPhase {
 
 		/**
+		 * bean定义注册阶段。
+		 * <p>
 		 * The {@link Condition} should be evaluated as a {@code @Configuration}
 		 * class is being parsed.
 		 * <p>If the condition does not match at this point, the {@code @Configuration}
@@ -49,6 +57,8 @@ public interface ConfigurationCondition extends Condition {
 		PARSE_CONFIGURATION,
 
 		/**
+		 * bean对象注册阶段。
+		 * <p>
 		 * The {@link Condition} should be evaluated when adding a regular
 		 * (non {@code @Configuration}) bean. The condition will not prevent
 		 * {@code @Configuration} classes from being added.

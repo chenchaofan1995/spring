@@ -72,12 +72,19 @@ class ConditionEvaluator {
 	}
 
 	/**
+	 * 判断当前bean是否应该被跳过。
+	 *
 	 * Determine if an item should be skipped based on {@code @Conditional} annotations.
 	 * @param metadata the meta data
 	 * @param phase the phase of the call
-	 * @return if the item should be skipped
+	 * @return true:允许被跳过，false:不允许被跳过
+	 *
+	 * if the item should be skipped
 	 */
 	public boolean shouldSkip(@Nullable AnnotatedTypeMetadata metadata, @Nullable ConfigurationPhase phase) {
+		/**
+		 * 类的注解信息为空或者没有被@Conditional标记不允许跳过。
+		 */
 		if (metadata == null || !metadata.isAnnotated(Conditional.class.getName())) {
 			return false;
 		}
@@ -91,20 +98,32 @@ class ConditionEvaluator {
 		}
 
 		List<Condition> conditions = new ArrayList<>();
-		for (String[] conditionClasses : getConditionClasses(metadata)) {
+		/**
+		 * 遍历@Conditional注解列的value值
+		 */
+		for (String[] conditionClasses : this.getConditionClasses(metadata)) {
 			for (String conditionClass : conditionClasses) {
-				Condition condition = getCondition(conditionClass, this.context.getClassLoader());
+				Condition condition = this.getCondition(conditionClass, this.context.getClassLoader());
 				conditions.add(condition);
 			}
 		}
 
+		/**
+		 * 对Condition对象排序：先按PriorityOrdered排序，然后按照order的值进行升序排序（值越小越先执行）。
+		 */
 		AnnotationAwareOrderComparator.sort(conditions);
 
 		for (Condition condition : conditions) {
 			ConfigurationPhase requiredPhase = null;
+			/**
+			 * 根据requiredPhase值，进行分阶段判断
+			 */
 			if (condition instanceof ConfigurationCondition) {
 				requiredPhase = ((ConfigurationCondition) condition).getConfigurationPhase();
 			}
+			/**
+			 * 如果有一个允许跳过，返回true
+			 */
 			if ((requiredPhase == null || requiredPhase == phase) && !condition.matches(this.context, metadata)) {
 				return true;
 			}
@@ -114,12 +133,21 @@ class ConditionEvaluator {
 	}
 
 	@SuppressWarnings("unchecked")
+	/**
+	 * 获取@Conditional注解的value属性值
+	 */
 	private List<String[]> getConditionClasses(AnnotatedTypeMetadata metadata) {
 		MultiValueMap<String, Object> attributes = metadata.getAllAnnotationAttributes(Conditional.class.getName(), true);
 		Object values = (attributes != null ? attributes.get("value") : null);
 		return (List<String[]>) (values != null ? values : Collections.emptyList());
 	}
 
+	/**
+	 * 实例化conditionClassName对象。
+	 * @param conditionClassName 是@Conditional注解的value值
+	 * @param classloader 类加载器
+	 * @return
+	 */
 	private Condition getCondition(String conditionClassName, @Nullable ClassLoader classloader) {
 		Class<?> conditionClass = ClassUtils.resolveClassName(conditionClassName, classloader);
 		return (Condition) BeanUtils.instantiateClass(conditionClass);

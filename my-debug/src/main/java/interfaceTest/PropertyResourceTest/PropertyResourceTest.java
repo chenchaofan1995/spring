@@ -22,10 +22,7 @@ public class PropertyResourceTest {
 	private String password;
 
 	public static void main(String[] args) throws IOException {
-		/*AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(PropertyResourceTest.class);
-		PropertyResourceTest propertyResourceTest = applicationContext.getBean("propertyResourceTest", PropertyResourceTest.class);
-		String password = propertyResourceTest.getPassword();
-		System.out.println(password);*/
+
 		PropertyResourceTest propertyResourceTest =new PropertyResourceTest();
 		propertyResourceTest.test();
 	}

@@ -74,28 +74,39 @@ abstract class ConfigurationClassUtils {
 
 
 	/**
+	 * 检测是否是配置类候选者。
+	 * <p>
 	 * Check whether the given bean definition is a candidate for a configuration class
 	 * (or a nested component class declared within a configuration/component class,
 	 * to be auto-registered as well), and mark it accordingly.
-	 * @param beanDef the bean definition to check
+	 *
+	 * @param beanDef               the bean definition to check
 	 * @param metadataReaderFactory the current factory in use by the caller
-	 * @return whether the candidate qualifies as (any kind of) configuration class
+	 *
+	 *返回结果说明：
+	 * @return true：是配置类候选者，false：不是配置类候选者
+	 * whether the candidate qualifies as (any kind of) configuration class
 	 */
 	public static boolean checkConfigurationClassCandidate(
 			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 
 		String className = beanDef.getBeanClassName();
+		/**
+		 * bean名称为空或者bean的工厂方法名称为空返回false.
+		 */
 		if (className == null || beanDef.getFactoryMethodName() != null) {
 			return false;
 		}
 
 		AnnotationMetadata metadata;
-		if (beanDef instanceof AnnotatedBeanDefinition &&
-				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
+		/**
+		 * 如果是注解BeanDefinition，获取bean定义的元数据。
+		 */
+		if (beanDef instanceof AnnotatedBeanDefinition
+				&& className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
 			metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
-		}
-		else if (beanDef instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) beanDef).hasBeanClass()) {
+		} else if (beanDef instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) beanDef).hasBeanClass()) {
 			// Check already loaded Class if present...
 			// since we possibly can't even load the class file for this Class.
 			Class<?> beanClass = ((AbstractBeanDefinition) beanDef).getBeanClass();
@@ -106,13 +117,11 @@ abstract class ConfigurationClassUtils {
 				return false;
 			}
 			metadata = AnnotationMetadata.introspect(beanClass);
-		}
-		else {
+		} else {
 			try {
 				MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(className);
 				metadata = metadataReader.getAnnotationMetadata();
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Could not find class file for introspecting configuration annotations: " +
 							className, ex);
@@ -121,19 +130,30 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
+		/**
+		 * 获取bean定义上的@Configuration注解的注解属性值
+		 */
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
 		else if (config != null || isConfigurationCandidate(metadata)) {
+			/**
+			 * 如果是配置类候选者添加CONFIGURATION_CLASS_ATTRIBUTE属性。
+			 */
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
-		}
-		else {
+		} else {
+			/**
+			 * 不是上面两个情况，证明不是配置类候选者
+			 */
 			return false;
 		}
 
 		// It's a full or lite configuration candidate... Let's determine the order value, if any.
 		Integer order = getOrder(metadata);
+		/**
+		 * 设置bean定义的实例化的顺序
+		 */
 		if (order != null) {
 			beanDef.setAttribute(ORDER_ATTRIBUTE, order);
 		}
@@ -142,20 +162,21 @@ abstract class ConfigurationClassUtils {
 	}
 
 	/**
-	 * Check the given metadata for a configuration class candidate
-	 * (or nested component class declared within a configuration/component class).
-	 * @param metadata the metadata of the annotated class
-	 * @return {@code true} if the given class is to be registered for
-	 * configuration class processing; {@code false} otherwise
+	 * 判断类是否是配置类
+	 *
+	 * @param metadata 配置类上的注解信息。
+	 * @return true是配置类，false不是配置类。
 	 */
 	public static boolean isConfigurationCandidate(AnnotationMetadata metadata) {
-		// Do not consider an interface or an annotation...
+		/**
+		 * 如果是接口直接返回false
+		 */
 		if (metadata.isInterface()) {
 			return false;
 		}
 
 		/**
-		 * 如果该类被@Component、@ComponentScan、@ComponentScan、ImportResource注解标记，就是后选配置类
+		 * 如果该类被@Component、@ComponentScan、@ComponentScan、ImportResource注解标记，返回true.
 		 */
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {
@@ -163,11 +184,12 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
-		// Finally, let's look for @Bean methods...
+		/**
+		 * 如果类的方法上有@Bean注解，返回true。
+		 */
 		try {
 			return metadata.hasAnnotatedMethods(Bean.class.getName());
-		}
-		catch (Throwable ex) {
+		} catch (Throwable ex) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Failed to introspect @Bean methods on class [" + metadata.getClassName() + "]: " + ex);
 			}
@@ -177,6 +199,7 @@ abstract class ConfigurationClassUtils {
 
 	/**
 	 * Determine the order for the given configuration class metadata.
+	 *
 	 * @param metadata the metadata of the annotated class
 	 * @return the {@code @Order} annotation value on the configuration class,
 	 * or {@code Ordered.LOWEST_PRECEDENCE} if none declared
@@ -191,6 +214,7 @@ abstract class ConfigurationClassUtils {
 	/**
 	 * Determine the order for the given configuration class bean definition,
 	 * as set by {@link #checkConfigurationClassCandidate}.
+	 *
 	 * @param beanDef the bean definition to check
 	 * @return the {@link Order @Order} annotation value on the configuration class,
 	 * or {@link Ordered#LOWEST_PRECEDENCE} if none declared
