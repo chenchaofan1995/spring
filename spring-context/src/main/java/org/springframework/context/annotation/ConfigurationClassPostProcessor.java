@@ -259,7 +259,13 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			processConfigBeanDefinitions((BeanDefinitionRegistry) beanFactory);
 		}
 
+		/**
+		 * 增强配置类
+		 */
 		enhanceConfigurationClasses(beanFactory);
+		/**
+		 * 添加bean后置处理器
+		 */
 		beanFactory.addBeanPostProcessor(new ImportAwareBeanPostProcessor(beanFactory));
 	}
 

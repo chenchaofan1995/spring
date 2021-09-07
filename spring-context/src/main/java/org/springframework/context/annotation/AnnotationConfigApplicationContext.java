@@ -92,7 +92,17 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+		/**
+		 * 1：在内部创建BeanFactory、Environment、ConditionEvaluator对象。
+		 * 2：在IOC容器中注册解析配置类的bean定义、解析@Autowire注解的Bean定义、
+		 * 解析JSR-250注解的Bean定义、 解析JPA注解的Bean定义、
+		 * 事件监听器的处理器bena定义、	事件监听器工厂的bean定义
+		 *
+		 */
 		this();
+		/**
+		 * 往IOC容器中注册启动类为Bean定义
+		 */
 		register(componentClasses);
 		refresh();
 	}

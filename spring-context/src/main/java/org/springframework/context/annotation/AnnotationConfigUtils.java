@@ -165,7 +165,7 @@ public abstract class AnnotationConfigUtils {
 		Set<BeanDefinitionHolder> beanDeanDefinitionSet = new LinkedHashSet<>(8);
 
 		/**
-		 * 注册配置类解析器的Bean定义
+		 * 注册配置类解析器的Bean定义、
 		 */
 		if (!registry.containsBeanDefinition(CONFIGURATION_ANNOTATION_PROCESSOR_BEAN_NAME)) {
 			RootBeanDefinition def = new RootBeanDefinition(ConfigurationClassPostProcessor.class);
@@ -259,6 +259,11 @@ public abstract class AnnotationConfigUtils {
 		processCommonDefinitionAnnotations(abd, abd.getMetadata());
 	}
 
+	/**
+	 * 通用注解的解析
+	 * @param abd
+	 * @param metadata
+	 */
 	static void processCommonDefinitionAnnotations(AnnotatedBeanDefinition abd, AnnotatedTypeMetadata metadata) {
 		AnnotationAttributes lazy = attributesFor(metadata, Lazy.class);
 		/**

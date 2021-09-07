@@ -266,6 +266,9 @@ public class AnnotatedBeanDefinitionReader {
 		abd.setScope(scopeMetadata.getScopeName());
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
 
+		/**
+		 * 通用bean定义注解的解析
+		 */
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
@@ -280,6 +283,9 @@ public class AnnotatedBeanDefinitionReader {
 				}
 			}
 		}
+		/**
+		 * 可扩展自己的bean定义解析器
+		 */
 		if (customizers != null) {
 			for (BeanDefinitionCustomizer customizer : customizers) {
 				customizer.customize(abd);

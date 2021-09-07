@@ -92,10 +92,14 @@ public class ComponentScanAnnotationParser {
 	 * @return
 	 */
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, final String declaringClass) {
+		/**
+		 * 第一步：创建扫描包下bean的扫描器（scanner）
+		 */
 		ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this.registry,
 				componentScan.getBoolean("useDefaultFilters"), this.environment, this.resourceLoader);
 
 		/**
+		 * 第二步：从@ComponentScan的注解属性里获取属性值，并赋值给scanner扫描器
 		 * 添加Bean的名称生成器
 		 */
 		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");
@@ -176,7 +180,7 @@ public class ComponentScanAnnotationParser {
 			}
 		});
 		/**
-		 * 开始扫描包下的类，并返回BeanDefinition
+		 *第三步：调用scanner.doScan()接口，开始真正的扫描，描包下的bean，并返回BeanDefinition
 		 */
 		return scanner.doScan(StringUtils.toStringArray(basePackages));
 	}

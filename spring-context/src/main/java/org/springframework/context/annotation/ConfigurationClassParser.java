@@ -145,7 +145,7 @@ public class ConfigurationClassParser {
 	private final ConditionEvaluator conditionEvaluator;
 
 	/**
-	 * 存储配置类
+	 *存储配置类
 	 */
 	private final Map<ConfigurationClass, ConfigurationClass> configurationClasses = new LinkedHashMap<>();
 
@@ -182,10 +182,17 @@ public class ConfigurationClassParser {
 	}
 
 
+	/**
+	 * 解析所有的配置类
+	 * @param configCandidates
+	 */
 	public void parse(Set<BeanDefinitionHolder> configCandidates) {
 		for (BeanDefinitionHolder holder : configCandidates) {
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
+				/**
+				 * 注解类型配置的解析
+				 */
 				if (bd instanceof AnnotatedBeanDefinition) {
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
 				}
@@ -205,6 +212,9 @@ public class ConfigurationClassParser {
 			}
 		}
 
+		/**
+		 * 延迟处理DeferredImportSelector接口
+		 */
 		this.deferredImportSelectorHandler.process();
 	}
 
@@ -242,7 +252,14 @@ public class ConfigurationClassParser {
 			return;
 		}
 
+		/**
+
+		 */
 		ConfigurationClass existingClass = this.configurationClasses.get(configClass);
+
+		/**
+		 * 配置类如果存在
+		 */
 		if (existingClass != null) {
 			if (configClass.isImported()) {
 				if (existingClass.isImported()) {
@@ -262,10 +279,16 @@ public class ConfigurationClassParser {
 		// Recursively process the configuration class and its superclass hierarchy.
 		SourceClass sourceClass = asSourceClass(configClass, filter);
 		do {
+			/**
+			 * 解析配置类
+			 */
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);
 		}
 		while (sourceClass != null);
 
+		/**
+		 * 存储配置类
+		 */
 		this.configurationClasses.put(configClass, configClass);
 	}
 
