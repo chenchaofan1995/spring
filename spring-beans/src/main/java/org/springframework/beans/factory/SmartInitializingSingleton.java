@@ -40,6 +40,9 @@ package org.springframework.beans.factory;
  * @author Juergen Hoeller
  * @since 4.1
  * @see org.springframework.beans.factory.config.ConfigurableListableBeanFactory#preInstantiateSingletons()
+ *
+ * 该接口在bean实例化完成,包括依赖注入完成,BeadPostProcess,InitializingBean,initMethod等等全部完成后,执行;
+ * 可以用于bean的收尾操作;
  */
 public interface SmartInitializingSingleton {
 

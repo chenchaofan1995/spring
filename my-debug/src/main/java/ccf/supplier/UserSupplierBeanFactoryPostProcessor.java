@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 public class UserSupplierBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        GenericBeanDefinition userSupplierBeanDefinition = (GenericBeanDefinition) beanFactory.getBeanDefinition("userSupplier");
+        GenericBeanDefinition userSupplierBeanDefinition = (GenericBeanDefinition) beanFactory.getBeanDefinition("user");
         userSupplierBeanDefinition.setInstanceSupplier(() -> {
-            UserSupplier userSupplier = new UserSupplier();
-            userSupplier.setName("lisi");
-            return userSupplier;
+            User user = new User();
+            user.setName("lisi");
+            return user;
         });
-        userSupplierBeanDefinition.setBeanClass(UserSupplier.class);
+        userSupplierBeanDefinition.setBeanClass(User.class);
     }
 }

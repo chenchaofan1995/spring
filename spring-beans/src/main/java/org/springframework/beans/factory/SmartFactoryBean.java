@@ -56,6 +56,9 @@ public interface SmartFactoryBean<T> extends FactoryBean<T> {
 	 * @see #getObject()
 	 * @see #isSingleton()
 	 */
+	/**
+	 *  若FactoryBean类型的bean是多列返回true.单例返回false
+	 */
 	default boolean isPrototype() {
 		return false;
 	}
@@ -74,6 +77,10 @@ public interface SmartFactoryBean<T> extends FactoryBean<T> {
 	 * <p>The default implementation returns {@code false}.
 	 * @return whether eager initialization applies
 	 * @see org.springframework.beans.factory.config.ConfigurableListableBeanFactory#preInstantiateSingletons()
+	 */
+	/**
+	 * 若FactoryBean类型的bean需要更早的实例，返回true
+	 * @return
 	 */
 	default boolean isEagerInit() {
 		return false;

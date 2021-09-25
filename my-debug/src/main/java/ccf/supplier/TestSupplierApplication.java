@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class TestSupplierApplication {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(TestSupplierApplication.class);
-        UserSupplier userSupplier = (UserSupplier)annotationConfigApplicationContext.getBean("userSupplier");
+        User userSupplier = (User)annotationConfigApplicationContext.getBean("userSupplier");
         System.out.println(userSupplier);
     }
 }

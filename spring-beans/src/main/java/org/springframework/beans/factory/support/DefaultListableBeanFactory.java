@@ -918,14 +918,26 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Iterate over a copy to allow for init methods which in turn register new bean definitions.
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
+		/**
+		 * 从beanDefinitionNames中获取所有的bean名称
+		 */
 		List<String> beanNames = new ArrayList<>(this.beanDefinitionNames);
 
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
+			/**
+			 * 根据名称获取bean定义
+			 */
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				/**
+				 * 如果bean是FactoryBean类型返回:true
+				 */
 				if (isFactoryBean(beanName)) {
-					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
+					/**
+					 * 提前实例化FactoryBean类型的对象
+					 */
+					Object bean = this.getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
@@ -933,21 +945,33 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 							isEagerInit = AccessController.doPrivileged(
 									(PrivilegedAction<Boolean>) ((SmartFactoryBean<?>) factory)::isEagerInit,
 									getAccessControlContext());
-						} else {
+						}
+						else {
 							isEagerInit = (factory instanceof SmartFactoryBean &&
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
+						/**
+						 * 如需要提前实例化,isEagerInit=true
+						 */
 						if (isEagerInit) {
-							getBean(beanName);
+							this.getBean(beanName);
 						}
 					}
 				} else {
+					/**
+					 * bean不是FactoryBean类型
+					 */
 					getBean(beanName);
 				}
 			}
 		}
 
 		// Trigger post-initialization callback for all applicable beans...
+		/**
+		 * bean完成实例化、初始化、、属性填充之后，若bean是SmartInitializingSingleton类型的对象。
+		 * 调用SmartInitializingSingleton.afterSingletonsInstantiated()接口。
+		 * 注意：afterSingletonsInstantiated()y
+		 */
 		for (String beanName : beanNames) {
 			Object singletonInstance = getSingleton(beanName);
 			if (singletonInstance instanceof SmartInitializingSingleton) {

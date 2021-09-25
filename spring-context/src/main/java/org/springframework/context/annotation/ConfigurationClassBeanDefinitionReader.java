@@ -116,8 +116,7 @@ class ConfigurationClassBeanDefinitionReader {
 	 */
 	public void loadBeanDefinitions(Set<ConfigurationClass> configurationModel) {
 		TrackedConditionEvaluator trackedConditionEvaluator = new TrackedConditionEvaluator();
-		for (ConfigurationClass configClass : configurationModel) {
-			loadBeanDefinitionsForConfigurationClass(configClass, trackedConditionEvaluator);
+		for (ConfigurationClass configClass : configurationModel) { loadBeanDefinitionsForConfigurationClass(configClass, trackedConditionEvaluator);
 		}
 	}
 
@@ -128,6 +127,9 @@ class ConfigurationClassBeanDefinitionReader {
 	private void loadBeanDefinitionsForConfigurationClass(
 			ConfigurationClass configClass, TrackedConditionEvaluator trackedConditionEvaluator) {
 
+		/**
+		 * 第一步：需判断配置类是否需要被跳过
+		 */
 		if (trackedConditionEvaluator.shouldSkip(configClass)) {
 			String beanName = configClass.getBeanName();
 			if (StringUtils.hasLength(beanName) && this.registry.containsBeanDefinition(beanName)) {
@@ -137,14 +139,26 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		/**
+		 * 第二步：判断配置类是否是被@Import导入进来的
+		 */
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
+		/**
+		 * 第三步：获取配置类被@Bean注解标记的BeanMethod
+		 */
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
+		/**
+		 * 第四步：加载被@ImportResource资源
+		 */
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
+		/**
+		 * 第五步：解析被ImportBeanDefinitionRegistrar导入进来的资源
+		 */
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
 
@@ -176,6 +190,9 @@ class ConfigurationClassBeanDefinitionReader {
 	 */
 	@SuppressWarnings("deprecation")  // for RequiredAnnotationBeanPostProcessor.SKIP_REQUIRED_CHECK_ATTRIBUTE
 	private void loadBeanDefinitionsForBeanMethod(BeanMethod beanMethod) {
+		/**
+		 * 获取@Bean注解所在的类。
+		 */
 		ConfigurationClass configClass = beanMethod.getConfigurationClass();
 		MethodMetadata metadata = beanMethod.getMetadata();
 		String methodName = metadata.getMethodName();
@@ -203,6 +220,9 @@ class ConfigurationClassBeanDefinitionReader {
 		String beanName = (!names.isEmpty() ? names.remove(0) : methodName);
 
 		// Register aliases even when overridden
+		/**
+		 * 注册别名
+		 */
 		for (String alias : names) {
 			this.registry.registerAlias(beanName, alias);
 		}
@@ -241,11 +261,20 @@ class ConfigurationClassBeanDefinitionReader {
 		 */
 		else {
 			// instance @Bean method
+			/**
+			 * 设置工厂名：是@Bean所在的类名
+			 */
 			beanDef.setFactoryBeanName(configClass.getBeanName());
+			/**
+			 * 设置工厂方法名：@Bean注解所在的方法名
+			 */
 			beanDef.setUniqueFactoryMethodName(methodName);
 		}
 
 		if (metadata instanceof StandardMethodMetadata) {
+			/**
+			 * 设置工厂方法的method对象
+			 */
 			beanDef.setResolvedFactoryMethod(((StandardMethodMetadata) metadata).getIntrospectedMethod());
 		}
 
@@ -275,7 +304,7 @@ class ConfigurationClassBeanDefinitionReader {
 		}
 
 		/**
-		 * 设置初始化方法
+		 * 获取@Bean注解的初始化方法名
 		 */
 		String initMethodName = bean.getString("initMethod");
 		if (StringUtils.hasText(initMethodName)) {
@@ -283,7 +312,7 @@ class ConfigurationClassBeanDefinitionReader {
 		}
 
 		/**
-		 * 设置销毁方法
+		 *  获取@Bean注解的销毁方法名
 		 */
 		String destroyMethodName = bean.getString("destroyMethod");
 		beanDef.setDestroyMethodName(destroyMethodName);

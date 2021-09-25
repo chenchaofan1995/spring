@@ -75,6 +75,10 @@ import org.springframework.util.ReflectionUtils;
  * @since 2.5
  * @see #setInitAnnotationType
  * @see #setDestroyAnnotationType
+ *
+ *
+ * 处理@PostConstruct、@PreDestroy、@Resource的Bean后置处理器
+ * 注意：CommonAnnotationBeanPostProcessor子类
  */
 @SuppressWarnings("serial")
 public class InitDestroyAnnotationBeanPostProcessor
@@ -100,14 +104,28 @@ public class InitDestroyAnnotationBeanPostProcessor
 
 	protected transient Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 该属性是@PostConstruct注解。
+	 * 在子类CommonAnnotationBeanPostProcessor的构造方法中初始化
+	 */
 	@Nullable
 	private Class<? extends Annotation> initAnnotationType;
 
+	/**
+	 * 该属性是@PreDestroy注解。
+	 * 在子类CommonAnnotationBeanPostProcessor的构造方法中初始化
+	 */
 	@Nullable
 	private Class<? extends Annotation> destroyAnnotationType;
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
+	/**
+	 * 存储所有被@PostConstruct,@PreDestroy标记的方法
+	 * LifecycleMetadata：是对方法进行来再次封装。具体查看结构便名了。
+	 *
+	 * key:类类型  value:是类的被@PostConstruct,@PreDestroy标记的方法
+	 */
 	@Nullable
 	private final transient Map<Class<?>, LifecycleMetadata> lifecycleMetadataCache = new ConcurrentHashMap<>(256);
 
@@ -144,6 +162,9 @@ public class InitDestroyAnnotationBeanPostProcessor
 	}
 
 
+	/**
+	 *  处理@PostConstruct、@PreDestroy、@Resource的Bean后置处理器
+	 */
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		LifecycleMetadata metadata = findLifecycleMetadata(beanType);
@@ -152,8 +173,14 @@ public class InitDestroyAnnotationBeanPostProcessor
 
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		/**
+		 * 找到bean中被@PostContruct标记的所有初始化方法
+		 */
 		LifecycleMetadata metadata = findLifecycleMetadata(bean.getClass());
 		try {
+			/**
+			 * 执行bean中被@PostContruct标记的所有初始化方法
+			 */
 			metadata.invokeInitMethods(bean, beanName);
 		}
 		catch (InvocationTargetException ex) {
@@ -196,6 +223,13 @@ public class InitDestroyAnnotationBeanPostProcessor
 	}
 
 
+	/**
+	 * 从lifecycleMetadataCache缓存里获取生命周期元数据。
+	 *生命周期元数据就是类里的被@PostContruct和@PreDestrooy标记的方法
+	 *
+	 * @param clazz
+	 * @return
+	 */
 	private LifecycleMetadata findLifecycleMetadata(Class<?> clazz) {
 		if (this.lifecycleMetadataCache == null) {
 			// Happens after deserialization, during destruction...
@@ -274,10 +308,19 @@ public class InitDestroyAnnotationBeanPostProcessor
 	 */
 	private class LifecycleMetadata {
 
+		/**
+		 * 类类型
+		 */
 		private final Class<?> targetClass;
 
+		/**
+		 * 类的所以init方法集合
+		 */
 		private final Collection<LifecycleElement> initMethods;
 
+		/**
+		 * 类的所有destroy方法集合
+		 */
 		private final Collection<LifecycleElement> destroyMethods;
 
 		@Nullable
@@ -321,6 +364,9 @@ public class InitDestroyAnnotationBeanPostProcessor
 			this.checkedDestroyMethods = checkedDestroyMethods;
 		}
 
+		/**
+		 * 调用target的所有InitMethod
+		 */
 		public void invokeInitMethods(Object target, String beanName) throws Throwable {
 			Collection<LifecycleElement> checkedInitMethods = this.checkedInitMethods;
 			Collection<LifecycleElement> initMethodsToIterate =
@@ -335,6 +381,9 @@ public class InitDestroyAnnotationBeanPostProcessor
 			}
 		}
 
+		/**
+		 * 调用target的所有DestroyMethod
+		 */
 		public void invokeDestroyMethods(Object target, String beanName) throws Throwable {
 			Collection<LifecycleElement> checkedDestroyMethods = this.checkedDestroyMethods;
 			Collection<LifecycleElement> destroyMethodsToUse =
@@ -363,8 +412,14 @@ public class InitDestroyAnnotationBeanPostProcessor
 	 */
 	private static class LifecycleElement {
 
+		/**
+		 * 被初始化注解和销毁注解标注的方法
+		 */
 		private final Method method;
 
+		/**
+		 * 方法名
+		 */
 		private final String identifier;
 
 		public LifecycleElement(Method method) {
@@ -372,6 +427,9 @@ public class InitDestroyAnnotationBeanPostProcessor
 				throw new IllegalStateException("Lifecycle method annotation requires a no-arg method: " + method);
 			}
 			this.method = method;
+			/**
+			 * 获取方法名
+			 */
 			this.identifier = (Modifier.isPrivate(method.getModifiers()) ?
 					ClassUtils.getQualifiedMethodName(method) : method.getName());
 		}

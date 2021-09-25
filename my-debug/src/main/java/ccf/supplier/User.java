@@ -5,11 +5,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserSupplier {
+public class User {
 
     private String name;
 
-    public UserSupplier() {
+    public User() {
     }
 
     public String getName() {

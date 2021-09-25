@@ -117,9 +117,15 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	private Set<Member> externallyManagedConfigMembers;
 
+	/**
+	 * 存储的是被@PostContruct标记的方法名
+	 */
 	@Nullable
 	private Set<String> externallyManagedInitMethods;
 
+	/**
+	 * 存储的是被@PreDestroy标记的方法名
+	 */
 	@Nullable
 	private Set<String> externallyManagedDestroyMethods;
 
@@ -418,6 +424,10 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 		return this.factoryMethodToIntrospect;
 	}
 
+	/**
+	 * 添加被@Resource标记的字段和接口
+	 * @param configMember
+	 */
 	public void registerExternallyManagedConfigMember(Member configMember) {
 		synchronized (this.postProcessingLock) {
 			if (this.externallyManagedConfigMembers == null) {

@@ -1,11 +1,9 @@
 package ccf.importtest;
 
-public class User {
+public class City {
 	private String name;
 
-	private City city;
-
-	public User() {
+	public City() {
 	}
 
 	public String getName() {
@@ -16,19 +14,18 @@ public class User {
 		this.name = name;
 	}
 
-	public City getCity() {
-		return city;
-	}
-
-	public void setCity(City city) {
-		this.city = city;
-	}
-
 	@Override
 	public String toString() {
-		return "User{" +
+		return "City{" +
 				"name='" + name + '\'' +
-				", city=" + city +
 				'}';
+	}
+
+	public void init(){
+		System.out.println("city 执行初始化");
+	}
+
+	public void destroy(){
+		System.out.println("city 执行销毁");
 	}
 }

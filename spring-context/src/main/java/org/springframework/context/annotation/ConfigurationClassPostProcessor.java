@@ -247,12 +247,21 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		/**
+		 * 获取factoryId主要是为了防止该接口重复执行。
+		 */
 		int factoryId = System.identityHashCode(beanFactory);
 		if (this.factoriesPostProcessed.contains(factoryId)) {
 			throw new IllegalStateException(
 					"postProcessBeanFactory already called on this post-processor against " + beanFactory);
 		}
 		this.factoriesPostProcessed.add(factoryId);
+
+		/**
+		 * 不存在factoryId才执行if里的接口。
+		 * 注意：在该类的postProcessBeanDefinitionRegistry接口里已经执行过processConfigBeanDefinitions（）接口。
+		 * 所以if里的代码不会被执行
+		 */
 		if (!this.registriesPostProcessed.contains(factoryId)) {
 			// BeanDefinitionRegistryPostProcessor hook apparently not supported...
 			// Simply call processConfigurationClasses lazily at this point then.

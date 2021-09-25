@@ -71,8 +71,14 @@ public class InjectionMetadata {
 
 	private static final Log logger = LogFactory.getLog(InjectionMetadata.class);
 
+	/**
+	 * 注解所在的类
+	 */
 	private final Class<?> targetClass;
 
+	/**
+	 * 被@Autowired、@Resource所标记的字段或方法
+	 */
 	private final Collection<InjectedElement> injectedElements;
 
 	@Nullable
@@ -118,6 +124,9 @@ public class InjectionMetadata {
 		this.checkedElements = checkedElements;
 	}
 
+	/**
+	 * 注入属性
+	 */
 	public void inject(Object target, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
 		Collection<InjectedElement> checkedElements = this.checkedElements;
 		Collection<InjectedElement> elementsToIterate =
@@ -127,6 +136,9 @@ public class InjectionMetadata {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Processing injected element of bean '" + beanName + "': " + element);
 				}
+				/**
+				 * 注入属性
+				 */
 				element.inject(target, beanName, pvs);
 			}
 		}
@@ -236,7 +248,14 @@ public class InjectionMetadata {
 			if (this.isField) {
 				Field field = (Field) this.member;
 				ReflectionUtils.makeAccessible(field);
-				field.set(target, getResourceToInject(target, requestingBeanName));
+				/**
+				 * 找到需要被注入的值
+				 */
+				Object resourceToInject = this.getResourceToInject(target, requestingBeanName);
+				/**
+				 * 将resourceToInject赋值给字段
+				 */
+				field.set(target,resourceToInject);
 			}
 			else {
 				if (checkPropertySkipping(pvs)) {

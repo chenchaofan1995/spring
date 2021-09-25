@@ -1,10 +1,15 @@
 package ccf.factorybean;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.SmartFactoryBean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
+/**
+ * SmartFactoryBean的父类就是FactoryBean
+ */
 @Component("user")
-public class UserFactoryBean implements FactoryBean<UserBean> {
+public class UserFactoryBean implements SmartFactoryBean<UserBean> {
     @Override
     public UserBean getObject() throws Exception {
         UserBean user = new UserBean();
@@ -22,4 +27,9 @@ public class UserFactoryBean implements FactoryBean<UserBean> {
     public boolean isSingleton() {
         return true;
     }
+
+	@Override
+	public boolean isEagerInit(){
+    	return false;
+	}
 }
