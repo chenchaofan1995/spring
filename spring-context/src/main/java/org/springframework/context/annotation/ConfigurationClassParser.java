@@ -541,9 +541,22 @@ public class ConfigurationClassParser {
 
 		for (String location : locations) {
 			try {
+				/**
+				 * 获取资源位置
+				 */
 				String resolvedLocation = this.environment.resolveRequiredPlaceholders(location);
+				/**
+				 * 获取资源
+				 */
 				Resource resource = this.resourceLoader.getResource(resolvedLocation);
-				addPropertySource(factory.createPropertySource(name, new EncodedResource(resource, encoding)));
+				/**
+				 * 从文件中读取数据，并封装到PropertySource对象里
+				 */
+				PropertySource<?> propertySourceValue = factory.createPropertySource(name, new EncodedResource(resource, encoding));
+				/**
+				 * 将读取到的文件值添加到environment对象中
+				 */
+				this.addPropertySource(propertySourceValue);
 			}
 			catch (IllegalArgumentException | FileNotFoundException | UnknownHostException | SocketException ex) {
 				// Placeholders not resolvable or resource not found when trying to open it

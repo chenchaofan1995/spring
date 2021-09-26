@@ -119,12 +119,18 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 	@Override
 	public void onRefresh() {
+		/**
+		 * 调用Lifecycle 对象的start接口
+		 */
 		startBeans(true);
 		this.running = true;
 	}
 
 	@Override
 	public void onClose() {
+		/**
+		 * 调用Lifecycle接口的close接口
+		 */
 		stopBeans();
 		this.running = false;
 	}
@@ -138,6 +144,9 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	// Internal helpers
 
 	private void startBeans(boolean autoStartupOnly) {
+		/**
+		 *从容器中获取所有的Lifecycle对象
+		 */
 		Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
 		Map<Integer, LifecycleGroup> phases = new HashMap<>();
 		lifecycleBeans.forEach((beanName, bean) -> {

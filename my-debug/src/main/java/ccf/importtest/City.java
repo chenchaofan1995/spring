@@ -1,7 +1,11 @@
 package ccf.importtest;
 
-public class City {
+
+
+public class City   {
 	private String name;
+
+	private String address;
 
 	public City() {
 	}
@@ -28,4 +32,5 @@ public class City {
 	public void destroy(){
 		System.out.println("city 执行销毁");
 	}
+
 }

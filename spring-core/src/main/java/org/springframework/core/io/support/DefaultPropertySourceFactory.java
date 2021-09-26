@@ -34,7 +34,14 @@ public class DefaultPropertySourceFactory implements PropertySourceFactory {
 
 	@Override
 	public PropertySource<?> createPropertySource(@Nullable String name, EncodedResource resource) throws IOException {
-		return (name != null ? new ResourcePropertySource(name, resource) : new ResourcePropertySource(resource));
+		if (name != null){
+			ResourcePropertySource resourcePropertySource = new ResourcePropertySource(name, resource);
+			return resourcePropertySource;
+		}else{
+			ResourcePropertySource resourcePropertySource = new ResourcePropertySource(resource);
+			return resourcePropertySource;
+		}
+		//return (name != null ? new ResourcePropertySource(name, resource) : new ResourcePropertySource(resource));
 	}
 
 }

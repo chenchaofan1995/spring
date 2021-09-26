@@ -75,6 +75,9 @@ public abstract class PropertySource<T> {
 		Assert.hasText(name, "Property source name must contain at least one character");
 		Assert.notNull(source, "Property source must not be null");
 		this.name = name;
+		/**
+		 * 从文件中所有值封装在该对象里
+		 */
 		this.source = source;
 	}
 

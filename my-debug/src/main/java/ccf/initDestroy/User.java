@@ -1,6 +1,10 @@
 package ccf.initDestroy;
 
-public class User {
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.stereotype.Component;
+
+public class User  implements InitializingBean, DisposableBean {
 	private String userName;
 
 	private Integer age;
@@ -27,5 +31,15 @@ public class User {
 				"userName='" + userName + '\'' +
 				", age=" + age +
 				'}';
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		System.out.println("DisposableBean 销毁");
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		System.out.println("InitializingBean 初始化");
 	}
 }

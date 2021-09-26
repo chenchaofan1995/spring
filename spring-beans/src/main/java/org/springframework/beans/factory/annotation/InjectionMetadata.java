@@ -264,7 +264,8 @@ public class InjectionMetadata {
 				try {
 					Method method = (Method) this.member;
 					ReflectionUtils.makeAccessible(method);
-					method.invoke(target, getResourceToInject(target, requestingBeanName));
+					Object resourceToInject = getResourceToInject(target, requestingBeanName);
+					method.invoke(target,resourceToInject );
 				}
 				catch (InvocationTargetException ex) {
 					throw ex.getTargetException();
